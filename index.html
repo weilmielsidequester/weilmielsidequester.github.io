@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- viewport-fit=cover: sonst bleibt unter der Home-Leiste des iPhones
+         ein weisser Streifen, sobald die App vom Homescreen startet. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+
+    <title>Sidequester</title>
+    <meta name="description" content="Kleine Aufgaben für die echte Welt. Rausgehen, machen, beweisen." />
+
+    <!-- Zum Home-Bildschirm hinzufügen: eigenes Icon, Vollbild ohne
+         Safari-Leiste, Name unter dem Icon. -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Sidequester" />
+    <meta name="theme-color" content="#FF6A3D" />
+
+    <!-- Kein Vorschautext beim Teilen des Links, der nach Baustelle aussieht. -->
+    <meta property="og:title" content="Sidequester" />
+    <meta property="og:description" content="Kleine Aufgaben für die echte Welt. Rausgehen, machen, beweisen." />
+    <meta property="og:type" content="website" />
+
+    <!-- The `react-native-web` recommended style reset -->
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        overflow: hidden;
+        /* Farbe aus tokens.js (color.bg) – ohne das blitzt beim Start
+           kurz Weiss auf, bevor die App gezeichnet ist. */
+        background-color: #FDFCFB;
+        overscroll-behavior: none;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+      /* Langes Drücken soll keine Textauswahl auslösen – die App wird
+         mit dem Finger bedient, nicht gelesen wie eine Webseite. */
+      body, #root {
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+    </style>
+  <link rel="icon" href="/favicon.ico"/></head>
+
+  <body>
+    <noscript>
+      Sidequester braucht JavaScript. Bitte im Browser aktivieren.
+    </noscript>
+    <div id="root"></div>
+  <script src="/entry-57456d81b9a69fb4eeb3b4defb44fb4e.js" defer></script>
+</body>
+</html>
