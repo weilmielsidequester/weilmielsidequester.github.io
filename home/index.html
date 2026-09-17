@@ -391,6 +391,9 @@ h1 {
 }
 .dots i.on { background: #fff; }
 .founders figcaption {
+  display: flex;
+  flex-wrap: wrap;            /* umbrechen nur zwischen Name und Rolle */
+  column-gap: 5px;
   margin: 14px 2px 0;
   font-size: 16px;
   line-height: 1.4;
@@ -402,7 +405,6 @@ h1 {
   color: var(--ink);
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-right: 5px;
 }
 
 /* ---------- Der Knopf ---------- */
@@ -821,7 +823,7 @@ h1 {
         '<img alt="' + esc(f.name) + '">' +
         '<span class="dots"></span>' +
       "</div>" +
-      "<figcaption><b>" + esc(f.name) + "</b>" + esc(f.role) + "</figcaption>" +
+      "<figcaption><b>" + esc(f.name) + "</b><span>" + esc(f.role) + "</span></figcaption>" +
     "</figure>"
   ).join("");
 
