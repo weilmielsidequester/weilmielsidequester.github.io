@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <!-- viewport-fit=cover: sonst bleibt unter der Home-Leiste des iPhones
          ein weisser Streifen, sobald die App vom Homescreen startet. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no, viewport-fit=cover" />
+    <!-- Telefonnummern nicht automatisch verlinken – das macht Text blau. -->
+    <meta name="format-detection" content="telephone=no" />
 
     <title>Sidequester</title>
     <meta name="description" content="Kleine Aufgaben für die echte Welt. Rausgehen, machen, beweisen." />
@@ -18,7 +20,9 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Sidequester" />
-    <meta name="theme-color" content="#FF6A3D" />
+    <!-- Gleiche Farbe wie der App-Hintergrund: Auf Android geht die
+         Statusleiste so nahtlos in die App über. -->
+    <meta name="theme-color" content="#FDFCFB" />
 
     <!-- Kein Vorschautext beim Teilen des Links, der nach Baustelle aussieht. -->
     <meta property="og:title" content="Sidequester" />
@@ -49,6 +53,28 @@
         -webkit-touch-callout: none;
         -webkit-tap-highlight-color: transparent;
       }
+
+      /* App-Gefühl statt Webseite:
+         - kein Doppeltipp-Zoom (touch-action: manipulation)
+         - keine Textauswahl beim Wischen, ausser in Eingabefeldern
+         - keine hellen/dunklen Systemfarben in Formularfeldern */
+      :root { color-scheme: light; }
+      * { touch-action: manipulation; }
+      body {
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      input, textarea, [contenteditable="true"] {
+        user-select: text;
+        -webkit-user-select: text;
+        /* Unter 16px zoomt iOS beim Antippen ins Feld hinein. */
+        font-size: max(16px, 1em);
+      }
+      img { -webkit-user-drag: none; user-drag: none; }
+      /* Scrollbalken gehören zu einer Webseite, nicht zu einer App. */
+      ::-webkit-scrollbar { width: 0; height: 0; }
     </style>
   <link rel="icon" href="/favicon.ico"/></head>
 
@@ -57,9 +83,38 @@
       Sidequester braucht JavaScript. Bitte im Browser aktivieren.
     </noscript>
     <div id="root"></div>
-  <script src="/entry-be1b0eb4050c36b41cfc6183a9df1c79.js" defer></script>
-  <!-- Zusatz von aussen, siehe home-verweis.js und README.
-       Nach jedem neuen App-Build wieder einfuegen. -->
-  <script src="/home-verweis.js" defer></script>
+
+    <script>
+      // Zoom blockieren – auch dort, wo das Viewport-Attribut allein nicht
+      // reicht (Safari ignoriert user-scalable seit iOS 10).
+      (function () {
+        var stop = function (e) { e.preventDefault(); };
+        // Zwei-Finger-Zoom in Safari
+        document.addEventListener('gesturestart', stop, { passive: false });
+        document.addEventListener('gesturechange', stop, { passive: false });
+        document.addEventListener('gestureend', stop, { passive: false });
+        // Strg/Cmd + Scrollrad am Computer
+        document.addEventListener('wheel', function (e) {
+          if (e.ctrlKey || e.metaKey) e.preventDefault();
+        }, { passive: false });
+        // Strg/Cmd + Plus/Minus/0
+        document.addEventListener('keydown', function (e) {
+          if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '0'].indexOf(e.key) !== -1) e.preventDefault();
+        });
+        // Doppeltipp-Zoom: zwei Tipps unter 300 ms zählen als einer.
+        var letzter = 0;
+        document.addEventListener('touchend', function (e) {
+          var jetzt = Date.now();
+          if (jetzt - letzter < 300) e.preventDefault();
+          letzter = jetzt;
+        }, { passive: false });
+        // Langes Drücken öffnet kein Browser-Menü.
+        document.addEventListener('contextmenu', function (e) {
+          if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+          e.preventDefault();
+        });
+      })();
+    </script>
+  <script src="/entry-8d1c3501d5e268f9ac4a3bf7bdcc0f7e.js" defer></script>
 </body>
 </html>
