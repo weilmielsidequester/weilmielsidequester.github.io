@@ -820,7 +820,11 @@ h1 {
   box.innerHTML = CONFIG.founders.map(f =>
     '<figure data-kuerzel="' + esc(f.bilder) + '">' +
       '<div class="pic">' +
-        '<img alt="' + esc(f.name) + '">' +
+        /* Das erste Bild direkt laden, parallel zur Suche — sonst steht
+           hier eine halbe Sekunde lang eine leere Fläche. alt bleibt vorerst
+           leer: ein alt-Text ohne Quelle zeigt das Kaputt-Symbol. */
+        '<img src="img/' + esc(f.bilder) + '-1.jpg" alt="" ' +
+             'onerror="this.removeAttribute(\'src\')">' +
         '<span class="dots"></span>' +
       "</div>" +
       "<figcaption><b>" + esc(f.name) + "</b><span>" + esc(f.role) + "</span></figcaption>" +
@@ -836,9 +840,12 @@ h1 {
     const bilder = await findeAlle(kuerzel);
     if (!bilder.length) { pic.classList.add("leer"); return; }
 
-    /* erstes Bild zeigen */
-    img.removeAttribute("style");
-    img.src = bilder[0];
+    /* Das erste Bild läuft schon; nur nachziehen, falls es anders heisst
+       (andere Endung) oder der optimistische Versuch fehlgeschlagen ist. */
+    img.alt = fig.querySelector("b").textContent;
+    if (!img.getAttribute("src") || !img.getAttribute("src").endsWith(bilder[0])) {
+      img.src = bilder[0];
+    }
 
     if (bilder.length < 2) return;          /* ein Bild: nichts zum Blättern */
 
