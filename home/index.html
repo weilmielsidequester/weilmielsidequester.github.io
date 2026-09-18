@@ -348,31 +348,39 @@ h1 {
    Bilder immer exakt gleich gross, egal wann sie geladen sind. Ein Foto
    mit abweichendem Format wird mittig eingepasst statt das Raster zu kippen. */
 /* Drei Personen.
-   Handy: drei ruhige Karten untereinander – Foto links, Name, Rolle und
-   Instagram rechts. Alle drei auf einen Blick, nichts angeschnitten.
+   Handy: Karussell. Die Karte in der Mitte ist ganz zu sehen, links und
+   rechts schaut je eine halbe heraus. Beim Start steht Maël in der Mitte,
+   gewischt wird endlos im Kreis (die Karten liegen dafür dreifach da,
+   die Kopien sind am Computer ausgeblendet).
    Ab Tablet: drei Karten nebeneinander. */
-.founders { display: flex; flex-direction: column; gap: 12px; }
+.founders {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Bis an den Bildschirmrand, damit die halben Karten wirklich am Rand
+     angeschnitten sind und nicht an der Textspalte. */
+  margin-left: calc(-1 * var(--pad));
+  margin-right: calc(-1 * var(--pad));
+  padding: 6px 0 18px;
+}
+.founders::-webkit-scrollbar { display: none; }
 .founders figure {
+  flex: 0 0 50%;
   margin: 0;
-  display: grid;
-  grid-template-columns: 36% 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 16px;
-  align-items: center;
-  padding: 10px;
-  background: var(--card);
-  border-radius: var(--r-card);
-  box-shadow: var(--shadow);
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  /* Die Karten am Rand treten zurück, die mittlere ist im Fokus. */
+  opacity: .55;
+  transform: scale(.92);
+  transition: opacity .25s ease-out, transform .25s ease-out;
 }
-.founders figure .pic { grid-row: 1 / span 2; box-shadow: none; }
-.founders figure figcaption { align-self: end; margin: 0 !important; }
-.founders figure .insta {
-  align-self: start;
-  justify-self: start;
-  /* Auf der weissen Karte: zarte Coral-Fläche statt weiss-auf-weiss. */
-  background: var(--coral-bg);
-  box-shadow: none;
-}
+.founders figure.mitte { opacity: 1; transform: none; }
+.founders figure figcaption { flex: 1; margin: 12px 2px 0 !important; }
+.founders figure .insta { align-self: flex-start; }
 
 @media (min-width: 560px) {
   .founders {
@@ -386,18 +394,11 @@ h1 {
     gap: 18px;
     align-items: stretch;
   }
-  .founders figure {
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    background: none;
-    box-shadow: none;
-    border-radius: 0;
-  }
-  .founders figure .pic { box-shadow: var(--shadow); }
-  .founders figure .insta { background: var(--card); box-shadow: var(--shadow); }
+  .founders { overflow: visible; margin-right: 0; padding: 0; }
+  .founders figure { opacity: 1; transform: none; }
+  .founders figure.kopie { display: none; }
   /* Knöpfe unten bündig, egal wie lang die Rolle ist. */
-  .founders figure figcaption { flex: 1; margin: 14px 2px 0 !important; }
+  .founders figure figcaption { margin: 14px 2px 0 !important; }
 }
 .founders .pic {
   position: relative;
@@ -897,8 +898,10 @@ h1 {
       '<circle cx="17.4" cy="6.6" r="0.9" fill="currentColor" stroke="none"/>' +
     "</svg>";
   const box = document.getElementById("founders");
-  box.innerHTML = CONFIG.founders.map(f =>
-    '<figure data-kuerzel="' + esc(f.bilder) + '">' +
+  /* Dreifach anlegen: [Kopie][echt][Kopie] – so lässt sich auf dem Handy
+     endlos im Kreis wischen. Am Computer blendet CSS die Kopien aus. */
+  const karte = (f, kopie) =>
+    '<figure data-kuerzel="' + esc(f.bilder) + '"' + (kopie ? ' class="kopie" aria-hidden="true"' : '') + '>' +
       '<div class="pic">' +
         /* Das erste Bild direkt laden, parallel zur Suche — sonst steht
            hier eine halbe Sekunde lang eine leere Fläche. alt bleibt vorerst
@@ -912,16 +915,72 @@ h1 {
         ? '<a class="insta" href="https://www.instagram.com/' + esc(f.insta) + '/" target="_blank" rel="noopener" ' +
             'aria-label="' + esc(f.name) + ' auf Instagram">' + INSTA_ICON + "Instagram</a>"
         : "") +
-    "</figure>"
-  ).join("");
+    "</figure>";
+  box.innerHTML = [
+    ...CONFIG.founders.map(f => karte(f, true)),
+    ...CONFIG.founders.map(f => karte(f, false)),
+    ...CONFIG.founders.map(f => karte(f, true)),
+  ].join("");
 
+  /* ---------- Karussell (nur Handy) ---------- */
+  (function karussell() {
+    const handy = () => window.matchMedia("(max-width: 559px)").matches;
+    const alle = () => [...box.querySelectorAll("figure")];
+    const n = CONFIG.founders.length;
+
+    function mitteFinden() {
+      const zentrum = box.getBoundingClientRect().left + box.clientWidth / 2;
+      let beste = 0, abstand = Infinity;
+      alle().forEach((f, i) => {
+        const r = f.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - zentrum);
+        if (d < abstand) { abstand = d; beste = i; }
+      });
+      return beste;
+    }
+    function markieren() {
+      const m = mitteFinden();
+      alle().forEach((f, i) => f.classList.toggle("mitte", i === m));
+      return m;
+    }
+    function zentrieren(i, sanft) {
+      const f = alle()[i];
+      const ziel = f.offsetLeft - (box.clientWidth - f.offsetWidth) / 2;
+      box.scrollTo({ left: ziel, behavior: sanft ? "smooth" : "auto" });
+    }
+    /* Beim Start: der echte Maël in der Mitte. */
+    function start() {
+      if (!handy()) { alle().forEach(f => f.classList.add("mitte")); return; }
+      zentrieren(n, false);
+      markieren();
+    }
+    let ruhe;
+    box.addEventListener("scroll", () => {
+      if (!handy()) return;
+      markieren();
+      clearTimeout(ruhe);
+      /* Nach dem Wischen: ist man in einer Kopie gelandet, unsichtbar auf
+         dieselbe Person im echten Satz springen – so geht es endlos weiter. */
+      ruhe = setTimeout(() => {
+        const m = mitteFinden();
+        if (m < n) zentrieren(m + n, false);
+        else if (m >= 2 * n) zentrieren(m - n, false);
+        markieren();
+      }, 140);
+    }, { passive: true });
+    window.addEventListener("resize", start);
+    requestAnimationFrame(start);
+    window.addEventListener("load", start);
+  })();
+
+  const suche = {};   /* dieselbe Person liegt dreifach da – nur einmal suchen */
   box.querySelectorAll("figure").forEach(async fig => {
     const kuerzel = fig.dataset.kuerzel;
     const pic = fig.querySelector(".pic");
     const img = fig.querySelector("img");
     const punkte = fig.querySelector(".dots");
 
-    const bilder = await findeAlle(kuerzel);
+    const bilder = await (suche[kuerzel] ||= findeAlle(kuerzel));
     if (!bilder.length) { pic.classList.add("leer"); return; }
 
     /* Das erste Bild läuft schon; nur nachziehen, falls es anders heisst
