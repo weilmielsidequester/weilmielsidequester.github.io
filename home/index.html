@@ -391,13 +391,14 @@ h1 {
 }
 .dots i.on { background: #fff; }
 .founders figcaption {
+  /* Name oben, Rolle darunter – bei beiden gleich, egal wie lang die
+     Rolle ist. Vorher brach nur die längere um und die Karten sahen
+     unterschiedlich aus. */
   display: flex;
-  flex-wrap: wrap;            /* umbrechen nur zwischen Name und Rolle */
-  column-gap: 5px;
+  flex-direction: column;
   margin: 14px 2px 0;
   font-size: 16px;
   line-height: 1.4;
-  min-height: 2.8em;          /* beide Beschriftungen bündig, auch wenn eine umbricht */
   color: var(--muted);
   letter-spacing: -0.012em;
 }
@@ -410,7 +411,7 @@ h1 {
 /* Instagram unter dem Namen: kleine Pille im Stil der Seite */
 .founders .insta {
   display: inline-flex; align-items: center; gap: 7px;
-  margin: 2px 2px 0;
+  margin: 12px 2px 0;
   padding: 8px 14px 8px 12px;
   border-radius: 999px;
   background: var(--card);
@@ -421,7 +422,11 @@ h1 {
   transition: transform .12s ease-out, color .12s ease-out;
 }
 .founders .insta svg { color: var(--coral); flex: none; }
-.founders .insta:hover { color: var(--coral); }
+/* Nur mit Maus: Auf dem Handy bliebe die Farbe nach dem Antippen
+   hängen, und die zwei Knöpfe sähen verschieden aus. */
+@media (hover: hover) {
+  .founders .insta:hover { color: var(--coral); }
+}
 .founders .insta:active { transform: scale(.97); }
 
 /* ---------- Der Knopf ---------- */
