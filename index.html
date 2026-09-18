@@ -44,7 +44,10 @@
       }
       #root {
         display: flex;
-        height: 100%;
+        /* Wird per Skript auf die sichtbare Höhe gesetzt – bei offener
+           Tastatur also nur der Bereich darüber. So bleibt das Eingabe-
+           feld im Chat sichtbar, obwohl die Seite selbst fest steht. */
+        height: var(--app-hoehe, 100%);
         flex: 1;
       }
       /* Langes Drücken soll keine Textauswahl auslösen – die App wird
@@ -59,7 +62,19 @@
          - keine Textauswahl beim Wischen, ausser in Eingabefeldern
          - keine hellen/dunklen Systemfarben in Formularfeldern */
       :root { color-scheme: light; }
-      * { touch-action: manipulation; }
+      /* pan-x pan-y: Wischen und Scrollen ja, Zoomen nein. Anders als
+         "manipulation" sperrt das auch das Zwei-Finger-Zoomen in Safari. */
+      html, body, #root, * { touch-action: pan-x pan-y; }
+      /* Die Seite selbst bleibt fest stehen – gescrollt wird nur innen
+         in der App. Sonst verrutscht in Safari das ganze Bild, sobald man
+         am Rand zieht oder die Tastatur aufgeht. */
+      html, body {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
       body {
         user-select: none;
         -webkit-user-select: none;
@@ -73,6 +88,18 @@
         font-size: max(16px, 1em);
       }
       img { -webkit-user-drag: none; user-drag: none; }
+
+      /* Am Computer: die App als Handy-Spalte in der Mitte statt über die
+         ganze Breite gezogen. Auf dem Handy ändert sich nichts. */
+      @media (min-width: 600px) {
+        body { background-color: #EFECE8; }
+        #root {
+          max-width: 460px;
+          margin: 0 auto;
+          background-color: #FDFCFB;
+          box-shadow: 0 0 0 1px rgba(22,20,46,.05), 0 24px 60px rgba(22,20,46,.10);
+        }
+      }
       /* Scrollbalken gehören zu einer Webseite, nicht zu einer App. */
       ::-webkit-scrollbar { width: 0; height: 0; }
     </style>
@@ -105,13 +132,38 @@
         document.addEventListener('keydown', function (e) {
           if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '0'].indexOf(e.key) !== -1) e.preventDefault();
         });
-        // Doppeltipp-Zoom: zwei Tipps unter 300 ms zählen als einer.
+        // Doppeltipp-Zoom: zwei Tipps unter 300 ms zählen als einer –
+        // aber nicht in Eingabefeldern, dort markiert Doppeltipp ein Wort.
         var letzter = 0;
         document.addEventListener('touchend', function (e) {
           var jetzt = Date.now();
-          if (jetzt - letzter < 300) e.preventDefault();
+          var feld = e.target && /INPUT|TEXTAREA/.test(e.target.tagName);
+          if (!feld && jetzt - letzter < 300) e.preventDefault();
           letzter = jetzt;
         }, { passive: false });
+        // Zwei Finger auf dem Bildschirm = Zoomversuch. Abfangen.
+        document.addEventListener('touchmove', function (e) {
+          if (e.touches && e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+        // Sichtbare Höhe mitführen: Tastatur auf = App wird kürzer, statt
+        // dass Safari die ganze Seite nach oben schiebt.
+        var vv = window.visualViewport;
+        function hoeheAnpassen() {
+          var h = vv ? vv.height : window.innerHeight;
+          document.documentElement.style.setProperty('--app-hoehe', h + 'px');
+          if (window.scrollY) window.scrollTo(0, 0);
+        }
+        if (vv) {
+          vv.addEventListener('resize', hoeheAnpassen);
+          vv.addEventListener('scroll', hoeheAnpassen);
+        }
+        window.addEventListener('resize', hoeheAnpassen);
+        hoeheAnpassen();
+        // Wenn die Tastatur zugeht, schiebt Safari die Seite manchmal nicht
+        // zurück. Dann wieder nach oben setzen.
+        document.addEventListener('focusout', function () {
+          setTimeout(hoeheAnpassen, 60);
+        });
         // Langes Drücken öffnet kein Browser-Menü.
         document.addEventListener('contextmenu', function (e) {
           if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
@@ -119,6 +171,6 @@
         });
       })();
     </script>
-  <script src="/entry-04be8347fc04430c3d1878aeaab49b59.js" defer></script>
+  <script src="/entry-abb1d156d866dab398b9ba9aa5ca6a0f.js" defer></script>
 </body>
 </html>
