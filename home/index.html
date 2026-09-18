@@ -43,7 +43,8 @@ const CONFIG = {
      "fotos-optimieren.command" verkleinert alle auf Webgrösse.     */
   founders: [
     { name: "Maël",   role: "hatte die Idee",      bilder: "mael",   insta: "maeel.mel"     },
-    { name: "Joscha", role: "findet die Idee gut", bilder: "joscha", insta: "joschatschanz" }
+    { name: "Joscha", role: "findet die Idee gut", bilder: "joscha", insta: "joschatschanz" },
+    { name: "Nio",    role: "hilft den zwei Chaoten, Struktur reinzubringen", bilder: "nio", insta: "niometzger" }
   ],
 
   /* ---- QUESTS ---------------------------------------------------
@@ -346,8 +347,46 @@ h1 {
    Deshalb stehen Spaltenbreite und Bildformat fest im CSS — dann sind die
    Bilder immer exakt gleich gross, egal wann sie geladen sind. Ein Foto
    mit abweichendem Format wird mittig eingepasst statt das Raster zu kippen. */
-.founders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
-.founders figure { margin: 0; }
+/* Drei Personen.
+   Handy: eine seitlich wischbare Reihe, die nächste Karte schaut am Rand
+   hervor – so sieht man ohne Hinweis, dass es weitergeht.
+   Ab Tablet: drei Karten nebeneinander. */
+.founders {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 68%;
+  gap: 14px;
+  align-items: stretch;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--pad);
+  /* Bis an den Bildschirmrand wischen, Text bleibt trotzdem bündig. */
+  margin-left: calc(-1 * var(--pad));
+  margin-right: calc(-1 * var(--pad));
+  padding: 4px var(--pad) 18px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.founders::-webkit-scrollbar { display: none; }
+@media (min-width: 560px) {
+  .founders {
+    /* Etwas breiter als die Textspalte, sonst würden drei Fotos kleiner
+       als vorher die zwei. */
+    --b: min(900px, calc(100vw - 2 * var(--pad)));
+    width: var(--b);
+    margin-left: calc(50% - var(--b) / 2);
+    margin-right: 0;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-columns: auto;
+    gap: 18px;
+    overflow: visible;
+    padding: 0;
+  }
+}
+/* Knöpfe unten bündig, egal wie lang die Rolle ist. */
+.founders figure { margin: 0; display: flex; flex-direction: column; scroll-snap-align: start; }
+.founders figure figcaption { flex: 1; }
 .founders .pic {
   position: relative;
   aspect-ratio: 3 / 4;
@@ -411,6 +450,7 @@ h1 {
 /* Instagram unter dem Namen: kleine Pille im Stil der Seite */
 .founders .insta {
   display: inline-flex; align-items: center; gap: 7px;
+  align-self: flex-start;
   margin: 12px 2px 0;
   padding: 8px 14px 8px 12px;
   border-radius: 999px;
