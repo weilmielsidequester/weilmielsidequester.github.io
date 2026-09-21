@@ -1,0 +1,33 @@
+{
+  "name": "Sidequester Management",
+  "short_name": "SQ Management",
+  "description": "Verwaltung für Sidequester: Feedback, Quests, Moderation, Team.",
+  "lang": "de",
+  "start_url": "/management",
+  "scope": "/game/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDFCFB",
+  "theme_color": "#FDFCFB",
+  "icons": [
+    {
+      "src": "/game/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/game/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/game/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "/management"
+}
