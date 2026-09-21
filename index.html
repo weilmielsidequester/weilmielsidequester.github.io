@@ -134,8 +134,15 @@
         });
         // Doppeltipp-Zoom: zwei Tipps unter 300 ms zählen als einer –
         // aber nicht in Eingabefeldern, dort markiert Doppeltipp ein Wort.
+        // Ausnahme: die Vollbild-Bildansicht zoomt selber. Dort dürfen die
+        // Finger nicht abgefangen werden, sonst bricht Safari die Geste ab.
+        function imBild(e) {
+          var t = e.target;
+          return !!(t && t.closest && t.closest('[data-zoombar]'));
+        }
         var letzter = 0;
         document.addEventListener('touchend', function (e) {
+          if (imBild(e)) return;
           var jetzt = Date.now();
           var feld = e.target && /INPUT|TEXTAREA/.test(e.target.tagName);
           if (!feld && jetzt - letzter < 300) e.preventDefault();
@@ -143,6 +150,7 @@
         }, { passive: false });
         // Zwei Finger auf dem Bildschirm = Zoomversuch. Abfangen.
         document.addEventListener('touchmove', function (e) {
+          if (imBild(e)) return;
           if (e.touches && e.touches.length > 1) e.preventDefault();
         }, { passive: false });
         // Sichtbare Höhe mitführen: Tastatur auf = App wird kürzer, statt
@@ -171,6 +179,6 @@
         });
       })();
     </script>
-  <script src="/entry-80e24a8296d1dd556b6d2d83d227b8c6.js" defer></script>
+  <script src="/entry-e2ed63d1162257df440b5ccc695fe7f2.js" defer></script>
 </body>
 </html>
