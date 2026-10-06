@@ -25,6 +25,14 @@ const CONFIG = {
      ------------------------------------------------------------- */
   appUrl:      "https://sidequester.ch/game",       // öffnet in einem neuen Tab
 
+  /* ---- APP STORE -----------------------------------------------
+     Sobald die App im Store ist, hier die Adresse eintragen. Dann
+     führt der grosse Knopf dorthin und darunter steht die Zeile
+     "Oder im Browser öffnen". Solange sie leer ist, bleibt alles
+     wie bisher: der Knopf führt in die Webversion.
+     ------------------------------------------------------------- */
+  appStoreUrl: "",                                  // z. B. https://apps.apple.com/ch/app/sidequester/id123456789
+
   /* ---- DIE ZWEI ------------------------------------------------
      FOTOS EINFACH REINLEGEN — hier muss nichts eingetragen werden.
 
@@ -485,6 +493,19 @@ h1 {
 /* ---------- Der Knopf ---------- */
 .cta { margin: 72px 0; text-align: center; }
 
+/* Zweite Zeile unter dem Knopf: der Weg in die Webversion.
+   display steht hier auf block, sonst setzt es das hidden-Attribut
+   ausser Kraft und die Zeile stuende da, bevor es die App gibt.
+   Die hidden-Regel ist genauer und gewinnt trotzdem. */
+.webLink[hidden] { display: none; }
+.webLink {
+  display: block; width: fit-content; margin: 18px auto 0;
+  font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--muted); text-decoration: none;
+  border-bottom: 1px solid rgba(0,0,0,0.12); padding-bottom: 2px;
+}
+.webLink:hover { color: var(--ink); }
+
 .bigbtn {
   display: inline-block;
   position: relative;
@@ -598,6 +619,9 @@ h1 {
     <a class="bigbtn" id="appLink" href="#" target="_blank" rel="noopener">
       <span class="b1" data-t="ctaButton"></span>
       <span class="b2" data-t="ctaNote"></span>
+    </a>
+    <a class="webLink" id="webLink" href="#" target="_blank" rel="noopener" hidden>
+      Oder im Browser öffnen
     </a>
   </section>
 
@@ -716,8 +740,22 @@ h1 {
 
   /* ---------- Links ---------- */
   const isPh = u => !u || u.startsWith("#PLATZHALTER");
-  document.getElementById("appLink").href = isPh(CONFIG.appUrl) ? "#" : CONFIG.appUrl;
-  if (isPh(CONFIG.appUrl)) console.warn("Sidequester: appUrl fehlt — der Knopf führt nirgendwohin.");
+  const knopf = document.getElementById("appLink");
+  const zweit = document.getElementById("webLink");
+
+  // Ist die App im Store, führt der grosse Knopf dorthin und die
+  // Webversion rutscht in die kleine Zeile darunter. Ohne Store-Link
+  // bleibt alles wie bisher.
+  if (!isPh(CONFIG.appStoreUrl)) {
+    knopf.href = CONFIG.appStoreUrl;
+    if (!isPh(CONFIG.appUrl)) {
+      zweit.href = CONFIG.appUrl;
+      zweit.hidden = false;
+    }
+  } else {
+    knopf.href = isPh(CONFIG.appUrl) ? "#" : CONFIG.appUrl;
+    if (isPh(CONFIG.appUrl)) console.warn("Sidequester: appUrl fehlt — der Knopf führt nirgendwohin.");
+  }
 
   /* ---------- Quests: endlos, immer nach rechts ----------
      Die Karten stehen zweimal hintereinander. Sobald die zweite
