@@ -52,7 +52,8 @@ const CONFIG = {
   founders: [
     { name: "Maël",   role: "hatte die Idee",      bilder: "mael",   insta: "maeel.mel"     },
     { name: "Joscha", role: "findet die Idee gut", bilder: "joscha", insta: "joschatschanz" },
-    { name: "Nio",    role: "hilft den zwei Chaoten, Struktur reinzubringen", bilder: "nio", insta: "niometzger" }
+    { name: "Nio",    role: "hilft den zwei Chaoten, Struktur reinzubringen", bilder: "nio", insta: "niometzger" },
+    { name: "Phillip", role: "hält die Chaoten auf Video fest", bilder: "phillip", insta: "phil.lip.w" }
   ],
 
   /* ---- QUESTS ---------------------------------------------------
@@ -355,12 +356,12 @@ h1 {
    Deshalb stehen Spaltenbreite und Bildformat fest im CSS — dann sind die
    Bilder immer exakt gleich gross, egal wann sie geladen sind. Ein Foto
    mit abweichendem Format wird mittig eingepasst statt das Raster zu kippen. */
-/* Drei Personen.
+/* Vier Personen.
    Handy: Karussell. Die Karte in der Mitte ist ganz zu sehen, links und
    rechts schaut je eine halbe heraus. Beim Start steht Maël in der Mitte,
    gewischt wird endlos im Kreis (die Karten liegen dafür dreifach da,
    die Kopien sind am Computer ausgeblendet).
-   Ab Tablet: drei Karten nebeneinander. */
+   Tablet: zwei mal zwei. Computer: vier Karten nebeneinander. */
 .founders {
   display: flex;
   gap: 12px;
@@ -392,13 +393,12 @@ h1 {
 
 @media (min-width: 560px) {
   .founders {
-    /* Etwas breiter als die Textspalte, sonst würden drei Fotos kleiner
-       als vorher die zwei. */
-    --b: min(900px, calc(100vw - 2 * var(--pad)));
+    /* Etwas breiter als die Textspalte, sonst werden die Fotos zu klein. */
+    --b: min(640px, calc(100vw - 2 * var(--pad)));
     width: var(--b);
     margin-left: calc(50% - var(--b) / 2);
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 18px;
     align-items: stretch;
   }
@@ -407,6 +407,12 @@ h1 {
   .founders figure.kopie { display: none; }
   /* Knöpfe unten bündig, egal wie lang die Rolle ist. */
   .founders figure figcaption { margin: 14px 2px 0 !important; }
+}
+@media (min-width: 900px) {
+  .founders {
+    --b: min(1080px, calc(100vw - 2 * var(--pad)));
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 .founders .pic {
   position: relative;
