@@ -577,6 +577,14 @@ h1 {
 
 /* ---------- Anleitung ---------- */
 .guide-intro { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+/* Rechtliches ganz unten, klein und ruhig. */
+.fuss {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px;
+  margin: 40px 0 calc(28px + env(safe-area-inset-bottom));
+  font-size: 13px;
+}
+.fuss a { color: var(--muted); text-decoration: none; }
+.fuss a:hover { color: var(--coral); }
 
 .step { display: grid; grid-template-columns: 28px 1fr; gap: 12px; }
 .step + .step { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
@@ -730,6 +738,12 @@ h1 {
     </div>
   </section>
 
+  <footer class="fuss">
+    <a href="/impressum.html">Impressum</a>
+    <a href="/datenschutz.html">Datenschutz</a>
+    <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>
+    <a href="mailto:sidequesterapp@gmail.com">sidequesterapp@gmail.com</a>
+  </footer>
 
 </div>
 
